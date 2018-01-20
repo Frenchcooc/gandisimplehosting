@@ -54,7 +54,7 @@ app.listen(app.get('port'), function() {
 });
 
 // Showing error
-// if vhost is not specified or unknown
+// if host is not specified or vhost is unknown
 function showError (req, res)
 {
   res.status(404);
