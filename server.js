@@ -12,8 +12,8 @@ global.gandi.i = 0;
 global.gandi.app = app;
 
 // For local development, you may specify which host
-// should be used as follows: `node server.js host=LOCALPROJECT`
-var localProject = undefined;
+// should be used as follows: `node server.js vhost="LOCALPROJECT"`
+var localProject;
 
 process.argv.forEach(function (val, index, array) {
   var options = val.split('=');
