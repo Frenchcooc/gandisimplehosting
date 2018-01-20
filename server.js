@@ -3,12 +3,13 @@ const app     = express();
 const path    = require('path');
 const fs      = require('fs');
 
-app.set('PRODUCTION', ((process.env.PORT) ? true : false));
 app.set('port', (process.env.PORT || 3030));
 
 global.gandi = {};
 global.gandi.i = 0;
 global.gandi.app = app;
+
+var currentProject = "stationf.ovh";
 
 app.use((req, res, next) =>
 {
@@ -16,9 +17,8 @@ app.use((req, res, next) =>
 
   if ('host' in req.headers)
   {
-    var host = (app.get('PRODUCTION') ? req.headers['host'] : 'stationf.ovh');
-        host = host.split(':')[0];
-        host = (app.get('PRODUCTION') ? host : '../' + host);
+    var host = req.headers['host'].split(':')[0];
+        host = (host == "localhost" ? ("../" + currentProject ) : host)
 
     var vhost = path.join(__dirname, host);
 
@@ -29,8 +29,7 @@ app.use((req, res, next) =>
       {
         global.gandi.request = req;
         global.gandi.response = res;
-        console.log('Vhost: ',vhost);
-        console.log('URL: ', req.originalUrl);
+
         var appVhost = require(vhost);
             appVhost(req, res, next);
       }
