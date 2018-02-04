@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   if (!('host' in req.headers))
     { showError(req, res); }
 
-  var host = (localProject ? localProject : req.headers['host'].split(':')[0]);
+  var host = localProject ? localProject : getRequestHost(req);
   var vhost = path.join(__dirname, host);
 
   fs.access(vhost, fs.constants.R_OK, (err) =>
@@ -53,10 +53,17 @@ app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));
 });
 
+/*
+ * UTILITIES
+ ********************/
+
+function getRequestHost (req)
+ { return req.headers['host'].split(':')[0]; }
+
 // Showing error
 // if host is not specified or vhost is unknown
 function showError (req, res)
 {
   res.status(404);
-  res.send('<!DOCYTPE html><html><body>Vhost is not specified or unknown - you may contact <a href="http://www.twitter.com/frenchcooc">@frenchcooc</a>\n');
+  res.send('<!DOCYTPE html><html><body>Vhost (<strong>'+getRequestHost(req)+'</strong>) is not specified or unknown - you may contact <a href="http://www.twitter.com/frenchcooc">@frenchcooc</a>\n');
 }

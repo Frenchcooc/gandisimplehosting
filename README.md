@@ -21,3 +21,6 @@ You may test the code locally by calling server.js as follows:
 ```
 node server.js vhost="YOUR_APP_DIRECTORY"
 ```
+
+### Troubleshootings
+You may encounter the following error: `Error: listen EADDRINUSE :::3030`. It generally means that multiple listening events are triggered. To avoid the error, you should add this to your app/index.js: `if (global.gandi) { module.exports = app; app.listen = function () {}; }`.
