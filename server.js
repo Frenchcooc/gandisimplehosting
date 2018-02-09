@@ -57,8 +57,7 @@ app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));
 });
 
-// Uncache required vhosts
-// at 2AM every day
+// Uncache vhosts every day at 2AM
 // to avoid a full reload
 var uncacheVhosts = schedule.scheduleJob('* 2 * * *', function () {
   Object.keys(require.cache).forEach(function(modulePath) {
