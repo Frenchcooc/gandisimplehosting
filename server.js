@@ -1,7 +1,8 @@
-const express = require('express');
-const app     = express();
-const path    = require('path');
-const fs      = require('fs');
+const express   = require('express');
+const app       = express();
+const path      = require('path');
+const fs        = require('fs');
+const schedule  = require('node-schedule');
 
 app.set('port', (process.env.PORT || 3030));
 
@@ -10,6 +11,7 @@ app.set('port', (process.env.PORT || 3030));
 global.gandi = {};
 global.gandi.i = 0;
 global.gandi.app = app;
+global.gandi.vhosts = {};
 
 // For local development, you may specify which host
 // should be used as follows: `node server.js vhost="LOCALPROJECT"`
@@ -38,11 +40,13 @@ app.use((req, res, next) => {
     if (err) { showError (req, res); }
     else
     {
-      global.gandi.request = req;
+      global.gandi.request  = req;
       global.gandi.response = res;
+      global.gandi.vhosts[vhost] = true;
 
       var appVhost = require(vhost);
           appVhost(req, res, next);
+
     }
   });
 });
@@ -51,6 +55,21 @@ app.use((req, res, next) => {
 // to listen on process port.
 app.listen(app.get('port'), function() {
     console.log('Node app is running on port', app.get('port'));
+});
+
+// Uncache required vhosts
+// at 2AM every day
+// to avoid a full reload
+var uncacheVhosts = schedule.scheduleJob('* 2 * * *', function () {
+  Object.keys(require.cache).forEach(function(modulePath) {
+    for (vhost in global.gandi.vhosts)
+    {
+      var vhostRegex = new RegExp(vhost);
+      if (modulePath.match(vhostRegex))
+        { delete require.cache[modulePath]; }
+    }
+  });
+
 });
 
 /*
